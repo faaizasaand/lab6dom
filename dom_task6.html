@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Todo App</title>
+    <style>
+        .completed {
+            text-decoration: line-through;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Todo App</h1>
+    <form id="todo-form">
+        <input type="text" id="todo-input" placeholder="Enter your todo">
+        <button type="submit">Add Todo</button>
+    </form>
+    <ul id="todo-list"></ul>
+
+    <script>
+        // Get todos from localStorage or use an empty array if there are no saved todos
+        var todos = JSON.parse(localStorage.getItem('todos')) || [];
+
+        // Function to render todos
+        function renderTodos() {
+            var todoList = document.getElementById('todo-list');
+            todoList.innerHTML = '';
+
+            todos.forEach(function (todo, index) {
+                var li = document.createElement('li');
+                var checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = todo.completed;
+                var todoText = document.createElement('span');
+                todoText.textContent = todo.text;
+
+                // Add event listener for checkbox to mark todo as completed
+                checkbox.addEventListener('change', function () {
+                    todos[index].completed = checkbox.checked;
+                    saveTodos();
+                    renderTodos();
+                });
+
+                var deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                // Add event listener for delete button to remove todo
+                deleteButton.addEventListener('click', function () {
+                    todos.splice(index, 1);
+                    saveTodos();
+                    renderTodos();
+                });
+
+                li.appendChild(checkbox);
+                li.appendChild(todoText);
+                li.appendChild(deleteButton);
+                todoList.appendChild(li);
+
+                // Apply completed class if todo is completed
+                if (todo.completed) {
+                    li.classList.add('completed');
+                }
+            });
+        }
+
+        // Function to save todos to localStorage
+        function saveTodos() {
+            localStorage.setItem('todos', JSON.stringify(todos));
+        }
+
+        // Event listener for form submission
+        var todoForm = document.getElementById('todo-form');
+        todoForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+            var todoInput = document.getElementById('todo-input');
+            var todoText = todoInput.value.trim();
+            if (todoText !== '') {
+                todos.push({
+                    text: todoText,
+                    completed: false
+                });
+                todoInput.value = '';
+                saveTodos();
+                renderTodos();
+            }
+        });
+
+        // Initial rendering of todos
+        renderTodos();
+    </script>
+</body>
+
+</html>
